@@ -1,0 +1,12 @@
+{
+  "model": "qwen3:8b",
+  "created_at": "2026-09-29T18:00:00.000000Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\"kunde\": {\"name\": \"STWEG Lindenweg 4\", \"strasse\": null, \"plz\": null, \"ort\": null}, \"leistungsdatum\": null, \"positionen\": [{\"beschreibung\": \"Hecke schneiden\", \"menge\": 5, \"einheit\": \"Std.\", \"einzelpreis\": 75}, {\"beschreibung\": \"Grüngut entsorgen\", \"menge\": 1, \"einheit\": \"pauschal\", \"einzelpreis\": 60}], \"zahlungsfrist_tage\": null, \"unsichere_felder\": [\"kunde.strasse\", \"kunde.plz\", \"kunde.ort\"]}"
+  },
+  "done_reason": "stop",
+  "done": true,
+  "total_duration": 3200000000,
+  "eval_count": 180
+}

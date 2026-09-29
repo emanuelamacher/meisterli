@@ -1,0 +1,12 @@
+{
+  "model": "qwen3:8b",
+  "created_at": "2026-09-29T18:00:00.000000Z",
+  "message": {
+    "role": "assistant",
+    "content": "{\"kunde\": {\"name\": \"Familie Keller\", \"strasse\": null, \"plz\": null, \"ort\": null}, \"leistungsdatum\": null, \"positionen\": [{\"beschreibung\": \"Arbeit\", \"menge\": 3, \"einheit\": \"Std.\", \"einzelpreis\": 90}, {\"beschreibung\": \"Lichtschalter\", \"menge\": 2, \"einheit\": \"Stk.\", \"einzelpreis\": 24}, {\"beschreibung\": \"Sicherungskasten\", \"menge\": 1, \"einheit\": \"Stk.\", \"einzelpreis\": 180}], \"zahlungsfrist_tage\": null, \"unsichere_felder\": [\"kunde.strasse\", \"kunde.plz\", \"kunde.ort\"]}"
+  },
+  "done_reason": "stop",
+  "done": true,
+  "total_duration": 3200000000,
+  "eval_count": 180
+}
