@@ -1,0 +1,38 @@
+{
+  "nachricht": "Nein, 4 Stunden",
+  "antwort": {
+    "absicht": "korrektur",
+    "aenderungen": {
+      "kunde": {
+        "name": null,
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [],
+      "positionen_aendern": [
+        {
+          "nr": 1,
+          "beschreibung": null,
+          "menge": 4,
+          "einheit": null,
+          "einzelpreis": null,
+          "entfernen": false
+        }
+      ],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "nachricht": "Rächnig für Keller: 1 Stund",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Keller",
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [
+        {
+          "beschreibung": "Arbeit",
+          "menge": 1,
+          "einheit": "Std.",
+          "einzelpreis": null
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

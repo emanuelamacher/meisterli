@@ -1,5 +1,17 @@
 """Systemprompt für das Auslesen der Rechnungsangaben."""
 
+MUNDART_BEISPIELE = """\
+Beispiele für Schweizerdeutsch:
+- "3 Stund à 90" → {"beschreibung": "Arbeit", "menge": 3, "einheit": "Std.", "einzelpreis": 90}
+- "Aafahrt 45" → {"beschreibung": "Anfahrt", "menge": 1, "einheit": "pauschal", "einzelpreis": 45}
+- "Abdecke pauschal 120" → {"beschreibung": "Abdecken", "menge": 1, "einheit": "pauschal", "einzelpreis": 120}
+- "2 Schalter à 24" → {"beschreibung": "Lichtschalter", "menge": 2, "einheit": "Stk.", "einzelpreis": 24}
+- "Sicherigskaschte 180" → {"beschreibung": "Sicherungskasten", "menge": 1, "einheit": "Stk.", "einzelpreis": 180}
+- "42 m² à 18" / "42 Quadratmeter à 18" → menge 42, einheit "m²", einzelpreis 18
+- "striiche" → streichen, "entkalche" → entkalken, "schniide" → schneiden,
+  "entsorge" → entsorgen, "Dichtige" → Dichtungen, "Grüengut" → Grüngut, "Stube" → Wohnzimmer/Stube
+"""
+
 SYSTEMPROMPT = """\
 Du liest aus der Sprachnachricht eines Schweizer Handwerkers die Angaben für eine Rechnung aus.
 Die Nachricht ist Schweizerdeutsch oder Hochdeutsch und oft ungenau transkribiert.
@@ -28,16 +40,7 @@ Regeln:
   ("hüt", "geschter", "am 12. Merz"). Das heutige Datum steht in der Nachricht.
 - zahlungsfrist_tage nur, wenn eine Frist genannt wird ("zahlbar innert 10 Täg" → 10).
 
-Beispiele für Schweizerdeutsch:
-- "3 Stund à 90" → {"beschreibung": "Arbeit", "menge": 3, "einheit": "Std.", "einzelpreis": 90}
-- "Aafahrt 45" → {"beschreibung": "Anfahrt", "menge": 1, "einheit": "pauschal", "einzelpreis": 45}
-- "Abdecke pauschal 120" → {"beschreibung": "Abdecken", "menge": 1, "einheit": "pauschal", "einzelpreis": 120}
-- "2 Schalter à 24" → {"beschreibung": "Lichtschalter", "menge": 2, "einheit": "Stk.", "einzelpreis": 24}
-- "Sicherigskaschte 180" → {"beschreibung": "Sicherungskasten", "menge": 1, "einheit": "Stk.", "einzelpreis": 180}
-- "42 m² à 18" / "42 Quadratmeter à 18" → menge 42, einheit "m²", einzelpreis 18
-- "striiche" → streichen, "entkalche" → entkalken, "schniide" → schneiden,
-  "entsorge" → entsorgen, "Dichtige" → Dichtungen, "Grüengut" → Grüngut, "Stube" → Wohnzimmer/Stube
-
+{MUNDART_BEISPIELE}
 Vollständiges Beispiel:
 Nachricht: "Rächnig für Familie Keller: 3 Stund à 90, 2 Schalter à 24, Sicherigskaschte 180"
 Antwort:
@@ -49,7 +52,7 @@ Antwort:
   {"beschreibung": "Sicherungskasten", "menge": 1, "einheit": "Stk.", "einzelpreis": 180}],
  "zahlungsfrist_tage": null,
  "unsichere_felder": ["kunde.strasse", "kunde.plz", "kunde.ort"]}
-"""
+""".replace("{MUNDART_BEISPIELE}", MUNDART_BEISPIELE.rstrip("\n"))
 
 
 def nutzernachricht(text: str, heute: str) -> str:

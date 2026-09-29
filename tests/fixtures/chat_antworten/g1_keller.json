@@ -1,0 +1,48 @@
+{
+  "nachricht": "Rächnig für Familie Keller: 3 Stund à 90, 2 Schalter à 24, Sicherigskaschte 180",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Familie Keller",
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [
+        {
+          "beschreibung": "Arbeit",
+          "menge": 3,
+          "einheit": "Std.",
+          "einzelpreis": 90
+        },
+        {
+          "beschreibung": "Lichtschalter",
+          "menge": 2,
+          "einheit": "Stk.",
+          "einzelpreis": 24
+        },
+        {
+          "beschreibung": "Sicherungskasten",
+          "menge": 1,
+          "einheit": "Stk.",
+          "einzelpreis": 180
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

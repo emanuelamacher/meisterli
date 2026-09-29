@@ -137,7 +137,9 @@ def _json_aus_antwort(inhalt: str) -> dict:
         raise AuslesenFehler(f"Das Sprachmodell hat kein gültiges JSON geliefert: {e}") from e
 
 
-class OllamaAusleser:
+class OllamaClient:
+    """Gemeinsamer HTTP-Teil: /api/chat mit Structured Outputs, Temperatur 0, ohne Thinking."""
+
     def __init__(
         self,
         url: str = config.OLLAMA_URL,
@@ -149,14 +151,14 @@ class OllamaAusleser:
         self.modell = modell
         self.client = client or httpx.Client(timeout=timeout)
 
-    def anfrage(self, text: str, heute: date, think: bool | None = False) -> dict:
+    def payload(self, system: str, nutzer: str, schema: dict, think: bool | None = False) -> dict:
         payload = {
             "model": self.modell,
             "messages": [
-                {"role": "system", "content": SYSTEMPROMPT},
-                {"role": "user", "content": nutzernachricht(text, heute.isoformat())},
+                {"role": "system", "content": system},
+                {"role": "user", "content": nutzer},
             ],
-            "format": SCHEMA,
+            "format": schema,
             "stream": False,
             "options": {"temperature": 0},
         }
@@ -174,12 +176,11 @@ class OllamaAusleser:
         except httpx.TimeoutException as e:
             raise AuslesenFehler("Ollama hat nicht rechtzeitig geantwortet.") from e
 
-    def roh(self, text: str, heute: date | None = None) -> dict:
-        heute = heute or date.today()
-        antwort = self._post(self.anfrage(text, heute))
+    def json_chat(self, system: str, nutzer: str, schema: dict) -> dict:
+        antwort = self._post(self.payload(system, nutzer, schema))
         if antwort.status_code == 400 and "think" in antwort.text.lower():
             # Modelle ohne Thinking-Unterstützung kennen den Parameter nicht.
-            antwort = self._post(self.anfrage(text, heute, think=None))
+            antwort = self._post(self.payload(system, nutzer, schema, think=None))
         if antwort.status_code == 404:
             raise AuslesenFehler(
                 f"Das Modell «{self.modell}» fehlt. Bitte `ollama pull {self.modell}` ausführen."
@@ -188,6 +189,15 @@ class OllamaAusleser:
             raise AuslesenFehler(f"Ollama-Fehler {antwort.status_code}: {antwort.text[:300]}")
         inhalt = antwort.json().get("message", {}).get("content", "")
         return _json_aus_antwort(inhalt)
+
+
+class OllamaAusleser(OllamaClient):
+    def anfrage(self, text: str, heute: date, think: bool | None = False) -> dict:
+        return self.payload(SYSTEMPROMPT, nutzernachricht(text, heute.isoformat()), SCHEMA, think)
+
+    def roh(self, text: str, heute: date | None = None) -> dict:
+        heute = heute or date.today()
+        return self.json_chat(SYSTEMPROMPT, nutzernachricht(text, heute.isoformat()), SCHEMA)
 
     def lese_aus(self, text: str, heute: date | None = None) -> dict:
         if not text or not text.strip():

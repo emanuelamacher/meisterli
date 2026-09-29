@@ -1,0 +1,29 @@
+{
+  "nachricht": "Die wohnen am Rosenweg 7 in 8404 Winterthur",
+  "antwort": {
+    "absicht": "antwort",
+    "aenderungen": {
+      "kunde": {
+        "name": null,
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": "Rosenweg 7, 8404 Winterthur",
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": "Rosenweg 7",
+      "plz": "8404",
+      "ort": "Winterthur",
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

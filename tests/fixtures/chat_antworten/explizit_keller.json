@@ -1,0 +1,36 @@
+{
+  "nachricht": "Rächnig für Familie Keller, Seeweg 2, 8400 Winterthur: 3 Stund à 95",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Familie Keller",
+        "strasse": "Seeweg 2",
+        "plz": "8400",
+        "ort": "Winterthur"
+      },
+      "positionen": [
+        {
+          "beschreibung": "Arbeit",
+          "menge": 3,
+          "einheit": "Std.",
+          "einzelpreis": 95
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

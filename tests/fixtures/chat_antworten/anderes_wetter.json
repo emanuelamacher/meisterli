@@ -1,0 +1,29 @@
+{
+  "nachricht": "Wie wird das Wetter morgen?",
+  "antwort": {
+    "absicht": "anderes",
+    "aenderungen": {
+      "kunde": {
+        "name": null,
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

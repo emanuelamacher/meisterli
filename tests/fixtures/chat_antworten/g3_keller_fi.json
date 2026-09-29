@@ -1,0 +1,44 @@
+{
+  "nachricht": "Rächnig für Familie Keller: 2 Stund, 1 FI",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Familie Keller",
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [
+        {
+          "beschreibung": "Arbeit",
+          "menge": 2,
+          "einheit": "Std.",
+          "einzelpreis": null
+        },
+        {
+          "beschreibung": "FI",
+          "menge": 1,
+          "einheit": "Stk.",
+          "einzelpreis": null
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": null,
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": [
+      "FI"
+    ]
+  }
+}
