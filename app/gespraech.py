@@ -24,6 +24,7 @@ from .chat_modell import ChatModell
 from .db import Datenbank, normalisiere_name
 from .dienst import EingabeFehler, erstelle_rechnung
 from .gedaechtnis import Gedaechtnis, woerter
+from .positionen import abkuerzungen_im_text
 from .rechnen import Position, berechne, zahl
 
 KUNDENFELDER = ("name", "strasse", "plz", "ort")
@@ -293,10 +294,11 @@ class Gespraech:
         if ae.get("zahlungsfrist_tage"):
             daten["zahlungsfrist_tage"] = ae["zahlungsfrist_tage"]
 
-        # Unklare Begriffe nur, wenn sie wirklich in der Nachricht stehen.
+        # Unklare Begriffe nur, wenn sie wirklich in der Nachricht stehen. Dazu kommen kurze
+        # Abkürzungen aus dem Text – auch wenn das Modell sie selbst «aufgelöst» hat.
         im_text = set(woerter(eingabe))
         name_woerter = set(woerter(kunde["name"]))
-        for b in unklar:
+        for b in list(unklar) + abkuerzungen_im_text(eingabe, kunde["name"]):
             if set(woerter(b)) <= im_text and not set(woerter(b)) <= name_woerter:
                 if b not in daten["unklare_begriffe"]:
                     daten["unklare_begriffe"].append(b)
@@ -414,7 +416,10 @@ class Gespraech:
     def _ersetze_begriff(position: dict, begriff: str, bedeutung: str) -> bool:
         """Ersetzt einen Begriff (ganzes Wort) in der Beschreibung durch seine Bedeutung."""
         b = position["beschreibung"]
-        if normalisiere_name(b) == normalisiere_name(begriff):
+        if normalisiere_name(b) == normalisiere_name(begriff) or normalisiere_name(b).startswith(
+            normalisiere_name(begriff) + "-"
+        ):
+            # «FI» oder eine eigene Auflösung des Modells wie «FI-Schutzschalter»
             position["beschreibung"] = bedeutung
         else:
             neu = re.sub(rf"(?<![\w-]){re.escape(begriff)}(?![\w-])", bedeutung, b, flags=re.I)

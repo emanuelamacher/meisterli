@@ -78,3 +78,49 @@ def test_stundenansatz_null_gilt_nicht(tmp_path):
     chat.sende("Rächnig für Herr Meier: Boiler entkalche 2 Stund, Aafahrt 45")
     a = chat.sende("0")
     assert "Welchen Stundenansatz nimmst du?" in texte_von(a)
+
+
+# Kunde, Datum, Abkürzungen (beobachtet mit qwen3:8b) --------------------------
+
+import pytest  # noqa: E402
+
+from app.positionen import abkuerzungen_im_text, bereinige_kunde, datum_genannt  # noqa: E402
+
+
+def test_familie_als_strasse():
+    k = bereinige_kunde({"name": "Keller", "strasse": "Familie", "plz": "", "ort": ""},
+                        "Rächnig für Familie Keller: 2 Stund")
+    assert k == {"name": "Familie Keller", "strasse": None, "plz": None, "ort": None}
+
+
+def test_anrede_aus_dem_text():
+    k = bereinige_kunde({"name": "Meier"}, "Rächnig für Herr Meier: 1 FI")
+    assert k["name"] == "Herr Meier"
+    assert bereinige_kunde({"name": "STWEG Lindenweg 4"}, "Rächnig für d STWEG Lindenweg 4")["name"] == "STWEG Lindenweg 4"
+
+
+def test_echte_adresse_bleibt():
+    k = bereinige_kunde({"name": "Familie Keller", "strasse": "Seeweg 2", "plz": "8400", "ort": "Winterthur"}, "")
+    assert k["strasse"] == "Seeweg 2" and k["plz"] == "8400"
+
+
+@pytest.mark.parametrize(
+    "text, genannt",
+    [("Rächnig für Herr Meier: 1 FI", False), ("… 2 Stund, geschter", True), ("am 12. Merz", True),
+     ("Hüt bi Keller gsi", True), ("am 3.9. gmacht", True), ("3 Stund à 90", False)],
+)
+def test_datum_genannt(text, genannt):
+    assert datum_genannt(text) is genannt
+
+
+def test_abkuerzungen_im_text():
+    assert abkuerzungen_im_text("Rächnig für Familie Keller: 2 Stund, 1 FI") == ["FI"]
+    assert abkuerzungen_im_text("FI-Schutzschalter, 85 Franke") == []
+    assert abkuerzungen_im_text("Rächnig für d STWEG Lindenweg 4, 90 CHF", "STWEG Lindenweg 4") == []
+
+
+def test_chat_leistungsdatum_nur_wenn_genannt():
+    roh = {"absicht": "neue_rechnung", "aenderungen": {"leistungsdatum": "2026-09-29", "positionen": []}}
+    assert normalisiere_chat(roh, "Rächnig für Herr Meier: 1 FI")["aenderungen"]["leistungsdatum"] is None
+    roh["aenderungen"]["leistungsdatum"] = "2026-09-28"
+    assert normalisiere_chat(roh, "geschter bi Meier")["aenderungen"]["leistungsdatum"] == "2026-09-28"

@@ -1,0 +1,44 @@
+{
+  "nachricht": "Rächnig für Familie Keller: 2 Stund, 1 FI",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Keller",
+        "strasse": "Familie",
+        "plz": "",
+        "ort": ""
+      },
+      "positionen": [
+        {
+          "beschreibung": "Arbeit",
+          "menge": 2,
+          "einheit": "Std.",
+          "einzelpreis": null
+        },
+        {
+          "beschreibung": "FI-Schutzschalter",
+          "menge": 1,
+          "einheit": "Stk.",
+          "einzelpreis": null
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": "2026-09-29",
+      "zahlungsfrist_tage": 0
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": "",
+      "bedeutung": "",
+      "betrag": 0,
+      "name": "",
+      "strasse": "",
+      "plz": "",
+      "ort": "",
+      "menge": 0
+    },
+    "unklare_begriffe": [
+      "FI"
+    ]
+  }
+}

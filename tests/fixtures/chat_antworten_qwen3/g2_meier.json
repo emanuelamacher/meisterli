@@ -1,0 +1,42 @@
+{
+  "nachricht": "Rächnig für Herr Meier: Boiler entkalche 2 Stund, Aafahrt 45",
+  "antwort": {
+    "absicht": "neue_rechnung",
+    "aenderungen": {
+      "kunde": {
+        "name": "Meier",
+        "strasse": null,
+        "plz": null,
+        "ort": null
+      },
+      "positionen": [
+        {
+          "beschreibung": "Boiler entkalken",
+          "menge": 2,
+          "einheit": "Std.",
+          "einzelpreis": null
+        },
+        {
+          "beschreibung": "Anfahrt",
+          "menge": 1,
+          "einheit": "pauschal",
+          "einzelpreis": 45
+        }
+      ],
+      "positionen_aendern": [],
+      "leistungsdatum": "2026-09-29",
+      "zahlungsfrist_tage": null
+    },
+    "antwort_auf_rueckfrage": {
+      "wert": null,
+      "bedeutung": null,
+      "betrag": null,
+      "name": null,
+      "strasse": null,
+      "plz": null,
+      "ort": null,
+      "menge": null
+    },
+    "unklare_begriffe": []
+  }
+}

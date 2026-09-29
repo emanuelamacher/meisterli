@@ -8,7 +8,7 @@ from typing import Protocol
 import httpx
 
 from . import config
-from .positionen import fasse_taetigkeiten_zusammen, nur_positiv
+from .positionen import bereinige_kunde, datum_genannt, fasse_taetigkeiten_zusammen, nur_positiv
 from .prompt import SYSTEMPROMPT, nutzernachricht
 from .rechnen import zahl
 
@@ -84,13 +84,15 @@ def normalisiere(roh: dict, text: str = "") -> dict:
     unsicher = {f for f in roh.get("unsichere_felder") or [] if isinstance(f, str)}
 
     kunde_roh = roh.get("kunde") if isinstance(roh.get("kunde"), dict) else {}
-    kunde = {f: _text(kunde_roh.get(f)) for f in KUNDENFELDER}
+    kunde = {f: _text(v) for f, v in bereinige_kunde(kunde_roh, text).items()} if text else {
+        f: _text(kunde_roh.get(f)) for f in KUNDENFELDER
+    }
     for f in KUNDENFELDER:
         if not kunde[f]:
             unsicher.add(f"kunde.{f}")
 
     leistungsdatum = None
-    if roh.get("leistungsdatum"):
+    if roh.get("leistungsdatum") and (not text or datum_genannt(text)):
         try:
             leistungsdatum = date.fromisoformat(str(roh["leistungsdatum"]).strip()).isoformat()
         except ValueError:

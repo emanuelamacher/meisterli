@@ -8,7 +8,7 @@ from datetime import date
 from typing import Protocol
 
 from .auslesen import AuslesenFehler, OllamaClient
-from .positionen import fasse_taetigkeiten_zusammen, nur_positiv
+from .positionen import bereinige_kunde, datum_genannt, fasse_taetigkeiten_zusammen, nur_positiv
 from .prompt import MUNDART_BEISPIELE
 from .rechnen import zahl
 
@@ -192,10 +192,11 @@ def normalisiere(roh: dict, text: str = "") -> dict:
     return {
         "absicht": absicht,
         "aenderungen": {
-            "kunde": {f: _text(kunde.get(f)) for f in ("name", "strasse", "plz", "ort")},
+            "kunde": bereinige_kunde({f: _text(kunde.get(f)) for f in ("name", "strasse", "plz", "ort")}, text),
             "positionen": positionen,
             "positionen_aendern": aendern,
-            "leistungsdatum": _text(ae.get("leistungsdatum")),
+            # Modelle setzen gern das heutige Datum ein, obwohl keines genannt wurde.
+            "leistungsdatum": _text(ae.get("leistungsdatum")) if datum_genannt(text) else None,
             "zahlungsfrist_tage": frist,
         },
         "antwort_auf_rueckfrage": antwort,

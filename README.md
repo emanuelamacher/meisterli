@@ -319,9 +319,14 @@ Attribut `name` und der Methode `transkribiere(pfad) -> str`. Dann gibst du sie 
   Begriff nicht als unklar erkennen). Eindeutige Antworten – Knöpfe, «Ja», eine Adresse wie
   «Rosenweg 7, 8404 Winterthur», eine Zahl, «FI-Schutzschalter, 85 Franke» – erkennt Python
   selbst, ohne Sprachmodell.
-- **Unklare Begriffe:** Neben dem Sprachmodell gilt eine einfache Regel: Eine Position aus
-  einer kurzen Abkürzung in Grossbuchstaben (z. B. «FI»), die Meisterli nicht kennt, ist
-  unklar.
+- **Unklare Begriffe:** Neben dem Sprachmodell gilt eine einfache Regel: Kurze Abkürzungen
+  in Grossbuchstaben (2–4 Buchstaben, z. B. «FI» oder «LED»), die Meisterli nicht kennt und die
+  nicht zum Kundennamen gehören, sind unklar. Meisterli fragt einmal nach und merkt sich die
+  Antwort.
+- **Bereinigung in Python:** `qwen3:8b` zerlegt Namen («Familie» als Strasse), lässt die Anrede
+  weg, setzt das heutige Datum ein oder schreibt 0 statt «fehlt». Python korrigiert das
+  (`app/positionen.py`); die echten Antworten liegen als Test-Fixtures in
+  `tests/fixtures/chat_antworten_qwen3/`.
 - **Gedächtnis:** Meisterli lernt nur aus Rückfragen, nicht aus dem, was du von dir aus
   schreibst. Ein Stundenansatz gilt für alle Arbeiten; unterschiedliche Ansätze
   (z. B. Lehrling und Meister) kennt der Pilot nicht.

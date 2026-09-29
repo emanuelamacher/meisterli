@@ -36,12 +36,12 @@ class GespeichertesChatModell:
 
     modell = "gespeichert"
 
-    def __init__(self):
+    def __init__(self, ordner: str = "chat_antworten"):
         from app.chat_modell import normalisiere
 
         self._normalisiere = normalisiere
         self.antworten = {}
-        for datei in sorted((FIXTURES / "chat_antworten").glob("*.json")):
+        for datei in sorted((FIXTURES / ordner).glob("*.json")):
             eintrag = json.loads(datei.read_text(encoding="utf-8"))
             self.antworten[eintrag["nachricht"]] = eintrag["antwort"]
         self.aufrufe: list[tuple[str, dict]] = []
@@ -50,4 +50,4 @@ class GespeichertesChatModell:
         self.aufrufe.append((nachricht, kontext))
         if nachricht not in self.antworten:
             raise AssertionError(f"Keine gespeicherte Antwort für: {nachricht!r}")
-        return self._normalisiere(self.antworten[nachricht])
+        return self._normalisiere(self.antworten[nachricht], nachricht)

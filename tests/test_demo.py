@@ -2,11 +2,21 @@
 
 from pypdf import PdfReader
 
+import pytest
+
 from tests.chat_hilfen import Chat, texte_von, typen
+from tests.conftest import GespeichertesChatModell
 
 
-def test_demo_vier_gespraeche(tmp_path):
-    chat = Chat(tmp_path)
+@pytest.mark.parametrize(
+    "ordner",
+    [
+        "chat_antworten",  # saubere Antworten nach Schema
+        "chat_antworten_qwen3",  # wörtlich, was qwen3:8b geliefert hat (./run.sh probe)
+    ],
+)
+def test_demo_vier_gespraeche(tmp_path, ordner):
+    chat = Chat(tmp_path, modell=GespeichertesChatModell(ordner))
 
     # Gespräch 1: Kunde neu, Adresse fehlt
     a = chat.sende("Rächnig für Familie Keller: 3 Stund à 90, 2 Schalter à 24, Sicherigskaschte 180")
