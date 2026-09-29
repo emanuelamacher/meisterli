@@ -179,3 +179,15 @@ def test_geloeschtes_wissen_wird_wieder_erfragt(chat):
     chat.sende(MEIER)
     a = chat.entwurf()
     assert a["rueckfrage"]["art"] == "adresse"
+
+
+def test_schweizer_rechtschreibung():
+    from pathlib import Path
+
+    from app import chat_modell
+
+    dateien = [Path("app/texte.py"), Path("app/templates/chat.html"), Path("app/templates/wissen.html"),
+               Path("app/static/chat.js")]
+    for d in dateien:
+        assert "ß" not in d.read_text(encoding="utf-8"), d
+    assert "ß" not in chat_modell.SYSTEMPROMPT

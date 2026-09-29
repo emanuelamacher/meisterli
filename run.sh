@@ -2,6 +2,7 @@
 # Startet den Meisterli-Piloten auf http://127.0.0.1:8000
 #   ./run.sh        App starten
 #   ./run.sh test   Tests laufen lassen
+#   ./run.sh https  Demo im lokalen Netz über HTTPS (fürs Handy, braucht Zertifikate in data/certs/)
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -32,7 +33,27 @@ fi
 
 command -v ffmpeg >/dev/null || echo "Hinweis: ffmpeg fehlt – Audio geht erst nach 'brew install ffmpeg'. Das Textfeld funktioniert."
 curl -s --max-time 2 "${MEISTERLI_OLLAMA_URL:-http://localhost:11434}/api/tags" >/dev/null \
-  || echo "Hinweis: Ollama antwortet nicht – bitte die Ollama-App starten."
+  || echo "Hinweis: Ollama antwortet nicht – starte es mit «brew services start ollama»."
 
-echo "Meisterli-Pilot läuft auf http://$HOST:$PORT (beenden mit Ctrl+C)"
+if [[ "${1:-}" == "https" ]]; then
+  CERT=data/certs/cert.pem
+  KEY=data/certs/key.pem
+  if [[ ! -f "$CERT" || ! -f "$KEY" ]]; then
+    cat <<HILFE
+Für HTTPS fehlen die Zertifikate. Einmalig (siehe README, Abschnitt «Demo auf dem Handy»):
+  brew install mkcert
+  mkcert -install
+  mkdir -p data/certs
+  mkcert -cert-file $CERT -key-file $KEY localhost 127.0.0.1 \$(ipconfig getifaddr en0) \$(scutil --get LocalHostName).local
+HILFE
+    exit 1
+  fi
+  IP="$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}')"
+  echo "Achtung: Die App ist jetzt im ganzen lokalen Netz erreichbar."
+  echo "Auf dem Handy (gleiches WLAN): https://${IP:-<IP-Adresse>}:$PORT/chat"
+  exec "${PY[@]}" uvicorn --factory app.main:create_app --host 0.0.0.0 --port "$PORT" \
+    --ssl-certfile "$CERT" --ssl-keyfile "$KEY"
+fi
+
+echo "Meisterli läuft auf http://$HOST:$PORT – Chat: http://$HOST:$PORT/chat (beenden mit Ctrl+C)"
 exec "${PY[@]}" uvicorn --factory app.main:create_app --host "$HOST" --port "$PORT"
