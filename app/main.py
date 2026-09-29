@@ -13,7 +13,11 @@ from fastapi.templating import Jinja2Templates
 from . import config
 from . import format as fmt
 from .auslesen import Ausleser, AuslesenFehler, OllamaAusleser
+from .chat import ChatDienst, chat_router
+from .chat_modell import ChatModell, OllamaChatModell
 from .db import Datenbank
+from .gedaechtnis import Gedaechtnis
+from .gespraech import Gespraech
 from .dienst import (
     EingabeFehler,
     ergaenze_kunde,
@@ -37,6 +41,7 @@ def create_app(
     data_dir: Path | None = None,
     transkribierer: Transkribierer | None = None,
     ausleser: Ausleser | None = None,
+    chat_modell: ChatModell | None = None,
 ) -> FastAPI:
     data_dir = Path(data_dir or config.DATA_DIR)
     audio_dir = data_dir / "audio"
@@ -47,6 +52,10 @@ def create_app(
     db = Datenbank(data_dir / "meisterli.db")
     transkribierer = transkribierer or standard_transkribierer()
     ausleser = ausleser or OllamaAusleser()
+    chat_modell = chat_modell or OllamaChatModell()
+    gedaechtnis = Gedaechtnis(db)
+    gespraech = Gespraech(db, gedaechtnis, chat_modell, pdf_dir)
+    dienst = ChatDienst(db, gespraech, transkribierer, audio_dir)
 
     app = FastAPI(title="Meisterli-Pilot")
     app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
@@ -55,6 +64,11 @@ def create_app(
     templates.env.filters["menge"] = lambda w: fmt.menge(zahl(w))
     templates.env.filters["datum"] = fmt.datum
     templates.env.globals["modell"] = getattr(ausleser, "modell", "")
+
+    app.include_router(chat_router(db, gedaechtnis, dienst, templates, audio_dir))
+    app.state.db = db
+    app.state.gedaechtnis = gedaechtnis
+    app.state.chat_dienst = dienst
 
     def seite(request: Request, name: str, **kontext):
         return templates.TemplateResponse(request, name, kontext)

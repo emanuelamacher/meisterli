@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titel %}Wissen{% endblock %}
+{% block inhalt %}
+<h1>Wissen</h1>
+<p class="leise">Das hat Meisterli aus deinen Antworten auf Rückfragen gelernt. Gespeichertes Wissen füllt nur Lücken –
+  was du ausdrücklich sagst oder schreibst, gewinnt immer.</p>
+{% if meldung %}<p class="meldung erfolg">{{ meldung }}</p>{% endif %}
+{% if fehler %}<p class="meldung fehler">{{ fehler }}</p>{% endif %}
+
+{% if eintraege %}
+<div class="karte wissen">
+  <table class="liste">
+    <thead>
+      <tr><th>Art</th><th>Eintrag</th><th>Quelle</th><th class="zahl">Benutzt</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for e in eintraege %}
+      {% set w = e.wert %}
+      <tr>
+        <td><span class="art art-{{ e.art }}">{{ arten[e.art] }}</span></td>
+        <td>
+          <form method="post" action="/wissen/{{ e.id }}" class="wissen-form" id="f{{ e.id }}">
+          {% if e.art == "kunde" %}
+            <input name="name" value="{{ w.name }}" aria-label="Name" class="breit">
+            <input name="strasse" value="{{ w.strasse }}" aria-label="Strasse" class="breit">
+            <input name="plz" value="{{ w.plz }}" aria-label="PLZ" class="kurz">
+            <input name="ort" value="{{ w.ort }}" aria-label="Ort">
+          {% elif e.art == "stundenansatz" %}
+            <span>CHF</span> <input name="betrag" value="{{ w.betrag }}" aria-label="Betrag" class="kurz" inputmode="decimal"> <span>pro Stunde</span>
+          {% elif e.art == "begriff" %}
+            <input name="schluessel" value="{{ e.schluessel }}" aria-label="Begriff" class="kurz"> <span>→</span>
+            <input name="bedeutung" value="{{ w.bedeutung }}" aria-label="Bedeutung">
+          {% elif e.art == "materialpreis" %}
+            <input name="schluessel" value="{{ e.schluessel }}" aria-label="Material">
+            <span>CHF</span> <input name="betrag" value="{{ w.betrag }}" aria-label="Betrag" class="kurz" inputmode="decimal">
+            <span>pro</span> <input name="einheit" value="{{ w.einheit }}" aria-label="Einheit" class="kurz">
+          {% else %}
+            <span>{{ "Zahlungsfrist" if e.schluessel == "zahlungsfrist_tage" else e.schluessel }}</span>
+            <input name="wert" value="{{ w.wert }}" aria-label="Wert" class="kurz" inputmode="numeric">
+            {% if e.schluessel == "zahlungsfrist_tage" %}<span>Tage</span>{% endif %}
+          {% endif %}
+          </form>
+        </td>
+        <td class="leise klein">
+          {% set r = rueckfragen.get(e.quelle_rueckfrage_id) %}
+          {% if r %}«{{ r.frage }}» → «{{ r.antwort }}»{% else %}{{ e.quelle }}{% endif %}
+          <br>{{ e.geaendert[:10] | datum }}
+        </td>
+        <td class="zahl">{{ e.benutzt }}×</td>
+        <td class="aktionen"><div>
+          <button type="submit" form="f{{ e.id }}" class="knopf">Speichern</button>
+          <form method="post" action="/wissen/{{ e.id }}/loeschen" onsubmit="return confirm('Eintrag löschen?')">
+            <button type="submit" class="knopf loeschen-knopf">Löschen</button>
+          </form>
+        </div></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="karte">Noch nichts gelernt. Im <a href="/chat">Chat</a> merkt sich Meisterli deine Antworten auf Rückfragen.</p>
+{% endif %}
+
+<form method="post" action="/wissen-vorgabe/zahlungsfrist" class="karte zeile">
+  <label class="zeile">Vorgabe Zahlungsfrist
+    <input name="wert" value="{{ frist or '' }}" class="kurz" inputmode="numeric" placeholder="–"> Tage
+  </label>
+  <button type="submit" class="knopf">Speichern</button>
+  <span class="leise klein">Leer lassen = Zahlungsfrist aus den Einstellungen.</span>
+</form>
+{% endblock %}

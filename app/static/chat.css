@@ -1,0 +1,215 @@
+/* Chat im Stil eines Messengers – eigene Farben und Formen, kein fremdes Logo oder Muster. */
+:root {
+  --kopf: #0b6e5f;
+  --kopf-text: #ffffff;
+  --hintergrund: #efe7dc;
+  --meine: #dcf8c6;
+  --seine: #ffffff;
+  --text: #111b21;
+  --leise: #667781;
+  --haken: #34b7f1;
+  --akzent: #0b6e5f;
+  --knopf-text: #027eb5;
+  --rot: #e5484d;
+  --schatten: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background: #d8dbd6;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+
+/* Bühne: auf dem Desktop ein Handy-Rahmen in der Mitte, auf dem Handy der ganze Bildschirm. */
+.buehne { height: 100%; display: flex; align-items: center; justify-content: center; }
+.handy {
+  position: relative; display: flex; flex-direction: column; overflow: hidden;
+  width: 100%; height: 100%; background: var(--hintergrund);
+}
+@media (min-width: 600px) and (min-height: 640px) {
+  body { background: radial-gradient(circle at 30% 20%, #eef0ec, #cfd4ce); }
+  .handy {
+    width: 400px; height: min(860px, calc(100vh - 48px));
+    border-radius: 44px; border: 12px solid #1c1c1e;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25), inset 0 0 0 1px #3a3a3c;
+  }
+  .handy::before { /* Kamera-Aussparung */
+    content: ""; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 24px; border-radius: 12px; background: #1c1c1e; z-index: 5;
+  }
+  .kopf { padding-top: 38px !important; }
+}
+
+/* Kopfzeile */
+.kopf {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  padding: calc(8px + env(safe-area-inset-top)) 8px 8px 4px;
+  background: var(--kopf); color: var(--kopf-text); z-index: 3;
+}
+.zurueck { color: inherit; display: flex; padding: 4px; border-radius: 50%; }
+.avatar svg { display: block; border-radius: 50%; }
+.titel { flex: 1; min-width: 0; line-height: 1.2; }
+.name { font-weight: 600; font-size: 16.5px; display: flex; align-items: center; gap: 6px; }
+.demo {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.2);
+}
+.status { font-size: 13px; opacity: 0.85; }
+.status.schreibt { font-style: italic; }
+.menue-knopf { background: none; border: 0; padding: 8px; border-radius: 50%; cursor: pointer; display: flex; }
+.menue-knopf:hover, .zurueck:hover { background: rgba(255, 255, 255, 0.12); }
+.menue {
+  position: absolute; right: 8px; top: calc(100% - 4px); min-width: 210px;
+  background: #fff; color: var(--text); border-radius: 10px; padding: 6px 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column;
+}
+.menue button, .menue a {
+  background: none; border: 0; text-align: left; padding: 11px 18px; cursor: pointer;
+  color: var(--text); text-decoration: none; font-size: 15px;
+}
+.menue button:hover, .menue a:hover { background: #f0f2f5; }
+.menue hr { border: 0; border-top: 1px solid #e9edef; margin: 4px 0; width: 100%; }
+
+/* Verlauf */
+.verlauf {
+  flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 10px 12px;
+  background: var(--hintergrund);
+  overscroll-behavior: contain;
+}
+.hinweis-verschluesselt {
+  margin: 4px auto 10px; max-width: 86%; text-align: center; font-size: 12px; color: #54656f;
+  background: #fdf3c4; padding: 6px 10px; border-radius: 8px; box-shadow: var(--schatten);
+}
+.datum {
+  margin: 10px auto; width: fit-content; font-size: 12px; color: #54656f;
+  background: #ffffff; padding: 4px 12px; border-radius: 8px; box-shadow: var(--schatten);
+  text-transform: uppercase; letter-spacing: 0.02em;
+}
+.zeile-links, .zeile-rechts { display: flex; flex-direction: column; margin: 2px 0; }
+.zeile-links { align-items: flex-start; }
+.zeile-rechts { align-items: flex-end; }
+.zeile-links + .zeile-rechts, .zeile-rechts + .zeile-links { margin-top: 8px; }
+
+.blase {
+  position: relative; max-width: 82%; padding: 6px 8px 8px 9px; border-radius: 8px;
+  box-shadow: var(--schatten); word-wrap: break-word; overflow-wrap: anywhere;
+}
+.blase.ich { background: var(--meine); border-top-right-radius: 0; }
+.blase.meisterli { background: var(--seine); border-top-left-radius: 0; }
+.blase.ich::after, .blase.meisterli::after { /* kleiner Zipfel */
+  content: ""; position: absolute; top: 0; width: 8px; height: 13px;
+}
+.blase.ich::after { right: -8px; background: linear-gradient(to bottom left, transparent 50%, var(--meine) 50%); }
+.blase.meisterli::after { left: -8px; background: linear-gradient(to bottom right, transparent 50%, var(--seine) 50%); }
+.folgend .blase::after { display: none; }
+.folgend .blase.ich { border-top-right-radius: 8px; }
+.folgend .blase.meisterli { border-top-left-radius: 8px; }
+
+.text { white-space: pre-wrap; }
+.meta {
+  float: right; margin: 6px 0 -4px 10px; font-size: 11px; color: var(--leise);
+  display: inline-flex; align-items: center; gap: 3px; line-height: 1;
+}
+.haken { width: 16px; height: 11px; color: #8696a0; }
+.haken.gelesen { color: var(--haken); }
+.blase.fehler { background: #fff1f1; }
+
+/* Drei Punkte */
+.tippt { display: flex; gap: 4px; padding: 12px 14px; }
+.tippt span {
+  width: 7px; height: 7px; border-radius: 50%; background: #9aa5ac;
+  animation: huepfen 1.2s infinite ease-in-out;
+}
+.tippt span:nth-child(2) { animation-delay: 0.15s; }
+.tippt span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes huepfen { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+/* Sprachnachricht */
+.sprach { display: flex; align-items: center; gap: 10px; min-width: 230px; padding: 2px 2px 0; }
+.play {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0; background: none;
+  color: #54656f; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.welle { flex: 1; display: flex; align-items: center; gap: 2px; height: 30px; cursor: pointer; }
+.welle i { flex: 1; min-width: 2px; border-radius: 2px; background: #b3bfc6; }
+.welle i.gespielt { background: #4fa3d1; }
+.blase.ich .welle i { background: #9fc49a; }
+.blase.ich .welle i.gespielt { background: #3f8f4d; }
+.sprach-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--leise); margin: 2px 0 0 44px; }
+.mini-avatar { flex: none; width: 38px; height: 38px; border-radius: 50%; background: #d5dbdf; position: relative;
+  display: flex; align-items: center; justify-content: center; color: #fff; }
+.mini-avatar svg { width: 20px; height: 20px; }
+.transkript { max-width: 82%; font-size: 12.5px; color: var(--leise); margin: 3px 4px 0; font-style: italic; text-align: right; }
+.transkript .dauer { font-style: normal; opacity: 0.8; }
+
+/* Zusammenfassung */
+.zusammenfassung { min-width: 260px; }
+.zf-titel { font-weight: 600; margin-bottom: 2px; }
+.zf-adresse { color: var(--leise); font-size: 13.5px; margin-bottom: 6px; }
+.gespeichert { color: #8a6d00; font-size: 12px; font-style: italic; white-space: nowrap; }
+.zf-positionen { width: 100%; border-collapse: collapse; font-size: 14px; margin: 4px 0; }
+.zf-positionen td { padding: 3px 0; vertical-align: top; }
+.zf-positionen td.betrag { text-align: right; white-space: nowrap; padding-left: 10px; font-variant-numeric: tabular-nums; }
+.zf-positionen .detail { color: var(--leise); font-size: 12.5px; }
+.zf-summen { width: 100%; border-collapse: collapse; font-size: 14px; border-top: 1px solid #e9edef; margin-top: 4px; }
+.zf-summen td { padding: 2px 0; font-variant-numeric: tabular-nums; }
+.zf-summen td:last-child { text-align: right; }
+.zf-summen tr.total td { font-weight: 700; font-size: 15.5px; padding-top: 4px; border-top: 1px solid #e9edef; }
+.zf-datum { font-size: 12.5px; color: var(--leise); margin-top: 6px; }
+.knoepfe { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; width: 82%; min-width: 260px; max-width: 82%; }
+.knoepfe button {
+  background: #fff; border: 0; border-radius: 8px; padding: 10px; box-shadow: var(--schatten);
+  color: var(--knopf-text); font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.knoepfe button:hover:not(:disabled) { background: #f7f8fa; }
+.knoepfe button:disabled { color: #a9b3b9; cursor: default; }
+
+/* Dokument */
+.dokument { display: block; min-width: 250px; color: inherit; text-decoration: none; }
+.dok-kopf { display: flex; align-items: center; gap: 10px; background: #f5f6f6; border-radius: 6px; padding: 10px; }
+.blase.ich .dok-kopf { background: #cfeebb; }
+.dok-icon { flex: none; width: 30px; height: 36px; position: relative; }
+.dok-name { font-size: 14.5px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dok-info { font-size: 12px; color: var(--leise); margin-top: 1px; }
+.dokument:hover .dok-kopf { background: #eceeef; }
+
+/* Eingabe */
+.eingabe {
+  display: flex; align-items: flex-end; gap: 6px;
+  padding: 6px 6px calc(8px + env(safe-area-inset-bottom)); background: transparent;
+}
+.feld {
+  flex: 1; min-width: 0; display: flex; align-items: flex-end; gap: 2px; min-height: 46px;
+  background: #fff; border-radius: 24px; padding: 4px 6px; box-shadow: var(--schatten);
+}
+.feld textarea {
+  flex: 1; border: 0; outline: none; resize: none; background: transparent; font: inherit; font-size: 16px;
+  padding: 9px 4px; max-height: 120px; line-height: 1.35; color: var(--text);
+}
+.rund {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.rund.klein { width: 38px; height: 38px; background: none; color: #54656f; }
+.rund.klein:hover { background: #f0f2f5; }
+.senden { background: var(--akzent); color: #fff; box-shadow: var(--schatten); }
+.senden:hover { filter: brightness(1.08); }
+.senden .icon-senden { display: none; }
+.senden.text .icon-senden, .senden.aufnahme .icon-senden { display: block; margin-left: 3px; }
+.senden.text .icon-mikro, .senden.aufnahme .icon-mikro { display: none; }
+.senden:disabled { opacity: 0.6; cursor: wait; }
+.feld.aufnahme { align-items: center; padding: 4px 12px 4px 6px; gap: 8px; }
+.punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--rot); animation: blinken 1s infinite; }
+@keyframes blinken { 50% { opacity: 0.25; } }
+.laufzeit { font-variant-numeric: tabular-nums; font-size: 16px; min-width: 40px; }
+.leise-text { color: var(--leise); font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.toast {
+  position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%); z-index: 10;
+  background: rgba(17, 27, 33, 0.9); color: #fff; font-size: 13.5px; padding: 8px 14px; border-radius: 8px;
+  max-width: 88%; text-align: center;
+}

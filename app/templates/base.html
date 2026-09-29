@@ -11,8 +11,10 @@
   <header class="kopfzeile">
     <a class="marke" href="/">Meisterli <span>Pilot</span></a>
     <nav>
+      <a href="/chat">Chat</a>
       <a href="/" {% if aktiv == "neu" %}class="aktiv"{% endif %}>Neue Rechnung</a>
       <a href="/rechnungen" {% if aktiv == "rechnungen" %}class="aktiv"{% endif %}>Rechnungen</a>
+      <a href="/wissen" {% if aktiv == "wissen" %}class="aktiv"{% endif %}>Wissen</a>
       <a href="/einstellungen" {% if aktiv == "einstellungen" %}class="aktiv"{% endif %}>Einstellungen</a>
     </nav>
   </header>

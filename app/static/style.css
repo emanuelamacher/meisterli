@@ -89,3 +89,20 @@ table.liste tr.neu { background: #e7f4ea; }
   table.liste tr { display: block; padding: 8px 0; }
   table.liste td { display: block; border: none; padding: 2px 12px; text-align: left; }
 }
+
+/* Wissen */
+.wissen table.liste { width: 100%; }
+.wissen td { vertical-align: top; }
+.wissen-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wissen-form input { width: auto; min-width: 0; flex: 1 1 140px; margin: 0; padding: 5px 8px; }
+.wissen-form input.kurz { flex: 0 1 80px; }
+.wissen-form input.breit { flex: 1 1 100%; }
+.aktionen div { display: flex; gap: 6px; justify-content: flex-end; }
+.aktionen form { margin: 0; }
+.aktionen .knopf { padding: 5px 10px; font-size: 0.9rem; }
+.wissen td:nth-child(2) { width: 45%; }
+.wissen td:nth-child(3) { max-width: 200px; }
+.loeschen-knopf { color: var(--fehler); }
+.art { display: inline-block; font-size: 0.8rem; padding: 2px 8px; border-radius: 99px; background: var(--grund); border: 1px solid var(--linie); white-space: nowrap; }
+label.zeile { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--text); }
+label.zeile input { width: 90px; margin: 0; }
