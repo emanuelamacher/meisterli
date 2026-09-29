@@ -12,6 +12,7 @@ dependencies = [
     "qrbill>=1.1",
     "weasyprint>=62",
     "mlx-whisper>=0.4; sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "rapidfuzz>=3.14.6",
 ]
 
 [dependency-groups]

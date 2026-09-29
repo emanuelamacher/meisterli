@@ -107,8 +107,9 @@ class Datenbank:
     def __init__(self, pfad: Path):
         self.pfad = Path(pfad)
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
-        with self.verbindung() as con:
-            con.executescript(SCHEMA)
+        from .migration import migriere
+
+        self.sicherung = migriere(self.pfad, SCHEMA)
 
     @contextmanager
     def verbindung(self):
@@ -255,3 +256,140 @@ class Datenbank:
                 )
             ]
         return d
+
+    # Phase 2: Chat --------------------------------------------------------
+
+    def aktuelles_gespraech(self) -> int:
+        """Es gibt einen Chat wie in WhatsApp. Fehlt er, wird er angelegt."""
+        with self.verbindung() as con:
+            row = con.execute("SELECT id FROM gespraeche ORDER BY id DESC LIMIT 1").fetchone()
+            if row:
+                return row[0]
+            return con.execute("INSERT INTO gespraeche (erstellt) VALUES (?)", (_jetzt(),)).lastrowid
+
+    def neue_nachricht(self, gespraech_id: int, absender: str, typ: str, inhalt: dict) -> int:
+        with self.verbindung() as con:
+            return con.execute(
+                "INSERT INTO nachrichten (gespraech_id, absender, typ, inhalt, zeit) VALUES (?, ?, ?, ?, ?)",
+                (gespraech_id, absender, typ, json.dumps(inhalt, ensure_ascii=False), _jetzt()),
+            ).lastrowid
+
+    def aendere_nachricht(self, nachricht_id: int, inhalt: dict) -> None:
+        with self.verbindung() as con:
+            con.execute(
+                "UPDATE nachrichten SET inhalt = ? WHERE id = ?",
+                (json.dumps(inhalt, ensure_ascii=False), nachricht_id),
+            )
+
+    def nachrichten(self, gespraech_id: int, nach: int = 0) -> list[dict]:
+        with self.verbindung() as con:
+            rows = con.execute(
+                "SELECT * FROM nachrichten WHERE gespraech_id = ? AND id > ? ORDER BY id",
+                (gespraech_id, nach),
+            ).fetchall()
+        return [dict(r, inhalt=json.loads(r["inhalt"])) for r in rows]
+
+    def nachricht(self, nachricht_id: int) -> dict | None:
+        with self.verbindung() as con:
+            r = con.execute("SELECT * FROM nachrichten WHERE id = ?", (nachricht_id,)).fetchone()
+        return dict(r, inhalt=json.loads(r["inhalt"])) if r else None
+
+    # Phase 2: Entwürfe im Chat -------------------------------------------
+
+    OFFENE_ZUSTAENDE = ("leer", "sammeln", "bestaetigen")
+
+    def offener_entwurf(self, gespraech_id: int) -> dict | None:
+        with self.verbindung() as con:
+            r = con.execute(
+                f"""SELECT * FROM entwuerfe WHERE gespraech_id = ?
+                    AND zustand IN ({",".join("?" * len(self.OFFENE_ZUSTAENDE))})
+                    ORDER BY id DESC LIMIT 1""",
+                (gespraech_id, *self.OFFENE_ZUSTAENDE),
+            ).fetchone()
+        return self._entwurf_zeile(r)
+
+    def chat_entwurf(self, entwurf_id: int) -> dict | None:
+        with self.verbindung() as con:
+            r = con.execute("SELECT * FROM entwuerfe WHERE id = ?", (entwurf_id,)).fetchone()
+        return self._entwurf_zeile(r)
+
+    @staticmethod
+    def _entwurf_zeile(r) -> dict | None:
+        if not r:
+            return None
+        d = dict(r)
+        d["daten"] = json.loads(d["daten"])
+        d["rueckfrage"] = json.loads(d["rueckfrage"]) if d.get("rueckfrage") else None
+        return d
+
+    def neuer_chat_entwurf(self, gespraech_id: int, daten: dict, transkript: str = "") -> int:
+        jetzt = _jetzt()
+        with self.verbindung() as con:
+            return con.execute(
+                """INSERT INTO entwuerfe (erstellt, geaendert, transkript, daten, gespraech_id, zustand)
+                   VALUES (?, ?, ?, ?, ?, 'leer')""",
+                (jetzt, jetzt, transkript, json.dumps(daten, ensure_ascii=False), gespraech_id),
+            ).lastrowid
+
+    def speichere_chat_entwurf(
+        self, entwurf_id: int, daten: dict, zustand: str, rueckfrage: dict | None,
+        rechnung_id: int | None = None,
+    ) -> None:
+        with self.verbindung() as con:
+            con.execute(
+                """UPDATE entwuerfe SET daten = ?, zustand = ?, rueckfrage = ?, geaendert = ?,
+                   rechnung_id = COALESCE(?, rechnung_id) WHERE id = ?""",
+                (
+                    json.dumps(daten, ensure_ascii=False),
+                    zustand,
+                    json.dumps(rueckfrage, ensure_ascii=False) if rueckfrage else None,
+                    _jetzt(),
+                    rechnung_id,
+                    entwurf_id,
+                ),
+            )
+
+    # Phase 2: Rückfragen --------------------------------------------------
+
+    def neue_rueckfrage(self, gespraech_id: int, entwurf_id: int, art: str, schluessel: str, frage: str) -> int:
+        with self.verbindung() as con:
+            return con.execute(
+                """INSERT INTO rueckfragen (gespraech_id, entwurf_id, art, schluessel, frage, gefragt)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (gespraech_id, entwurf_id, art, schluessel, frage, _jetzt()),
+            ).lastrowid
+
+    def beantworte_rueckfrage(self, rueckfrage_id: int, antwort: str) -> None:
+        with self.verbindung() as con:
+            con.execute(
+                "UPDATE rueckfragen SET antwort = ?, beantwortet = ? WHERE id = ?",
+                (antwort, _jetzt(), rueckfrage_id),
+            )
+
+    def rueckfragen(self) -> list[dict]:
+        with self.verbindung() as con:
+            return [dict(r) for r in con.execute("SELECT * FROM rueckfragen ORDER BY id")]
+
+    # Phase 2: Zurücksetzen -----------------------------------------------
+
+    def chat_leeren(self, gespraech_id: int) -> None:
+        """Löscht die Nachrichten und verwirft den offenen Entwurf. Das Gedächtnis bleibt."""
+        with self.verbindung() as con:
+            con.execute("DELETE FROM nachrichten WHERE gespraech_id = ?", (gespraech_id,))
+            con.execute(
+                f"""UPDATE entwuerfe SET zustand = 'verworfen', rueckfrage = NULL
+                    WHERE gespraech_id = ? AND zustand IN ({",".join("?" * len(self.OFFENE_ZUSTAENDE))})""",
+                (gespraech_id, *self.OFFENE_ZUSTAENDE),
+            )
+
+    def alles_zuruecksetzen(self) -> None:
+        """Für eine frische Demo: Chat, Entwürfe, Rückfragen, Wissen und Kunden weg.
+        Firmendaten und erstellte Rechnungen bleiben (Rechnungsnummern zählen weiter)."""
+        with self.verbindung() as con:
+            con.execute("DELETE FROM wissen")
+            con.execute("DELETE FROM rueckfragen")
+            con.execute("DELETE FROM nachrichten")
+            con.execute("DELETE FROM entwuerfe WHERE gespraech_id IS NOT NULL")
+            con.execute("DELETE FROM gespraeche")
+            con.execute("UPDATE rechnungen SET kunde_id = NULL")
+            con.execute("DELETE FROM kunden")
