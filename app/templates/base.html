@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titel %}Meisterli{% endblock %} – Meisterli-Pilot</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23b3261e'/><path d='M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z' fill='white'/></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="kopfzeile">
+    <a class="marke" href="/">Meisterli <span>Pilot</span></a>
+    <nav>
+      <a href="/" {% if aktiv == "neu" %}class="aktiv"{% endif %}>Neue Rechnung</a>
+      <a href="/rechnungen" {% if aktiv == "rechnungen" %}class="aktiv"{% endif %}>Rechnungen</a>
+      <a href="/einstellungen" {% if aktiv == "einstellungen" %}class="aktiv"{% endif %}>Einstellungen</a>
+    </nav>
+  </header>
+  <main>
+    {% block inhalt %}{% endblock %}
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

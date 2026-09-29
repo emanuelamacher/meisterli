@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titel %}Neue Rechnung{% endblock %}
+{% block inhalt %}
+<h1>Neue Rechnung</h1>
+
+{% if not einstellungen_ok %}
+<p class="meldung warnung">Deine Firmendaten sind noch unvollständig.
+  <a href="/einstellungen">Einstellungen ausfüllen</a> – sonst kann keine Rechnung erstellt werden.</p>
+{% endif %}
+
+<form id="eingabe" class="karte">
+  <section>
+    <h2>Sprachnachricht</h2>
+    <div class="zeile">
+      <button type="button" id="aufnahme" class="knopf">● Aufnahme starten</button>
+      <span id="aufnahme-status" class="leise"></span>
+    </div>
+    <audio id="aufnahme-player" controls hidden></audio>
+    <p class="leise">oder Datei hochladen (.ogg/.opus von WhatsApp, .m4a, .mp3, .wav, .webm):</p>
+    <input type="file" id="datei" name="audio" accept=".ogg,.opus,.m4a,.mp3,.wav,.webm,.mp4,.aac,audio/*">
+  </section>
+
+  <section>
+    <h2>… oder Text eingeben</h2>
+    <p class="leise">Überspringt die Transkription – zum schnellen Testen.</p>
+    <textarea id="text" name="text" rows="3"
+      placeholder="Rächnig für Familie Keller: 3 Stund à 90, 2 Schalter à 24, Sicherigskaschte 180"></textarea>
+  </section>
+
+  <div class="zeile">
+    <button type="submit" class="knopf haupt" id="verarbeiten">Auslesen</button>
+    <span id="fortschritt" class="leise"></span>
+  </div>
+  <p id="fehler" class="meldung fehler" hidden></p>
+  <pre id="transkript-fehler" class="transkript" hidden></pre>
+</form>
+
+<p class="leise klein">Transkription: {{ transkribierer }} · Auslesen: {{ modell }} (Ollama, lokal)</p>
+{% endblock %}

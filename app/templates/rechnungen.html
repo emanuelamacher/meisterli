@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titel %}Rechnungen{% endblock %}
+{% block inhalt %}
+<h1>Rechnungen</h1>
+{% if neu %}
+<p class="meldung erfolg">Rechnung erstellt.
+  <a href="/rechnungen/{{ neu }}/pdf" target="_blank">PDF öffnen</a> ·
+  <a href="/rechnungen/{{ neu }}/pdf?download=1">herunterladen</a></p>
+{% endif %}
+{% if rechnungen %}
+<table class="liste karte">
+  <thead>
+    <tr><th>Nummer</th><th>Datum</th><th>Kunde</th><th class="zahl">Total CHF</th><th>Fällig</th><th>PDF</th></tr>
+  </thead>
+  <tbody>
+  {% for r in rechnungen %}
+    <tr {% if r.id == neu %}class="neu"{% endif %}>
+      <td>{{ r.nummer }}</td>
+      <td>{{ r.rechnungsdatum | datum }}</td>
+      <td>{{ r.kunde_name }}<br><span class="leise">{{ r.kunde_plz }} {{ r.kunde_ort }}</span></td>
+      <td class="zahl">{{ r.total | chf }}</td>
+      <td>{{ r.faellig_am | datum }}</td>
+      <td><a href="/rechnungen/{{ r.id }}/pdf" target="_blank">Öffnen</a> ·
+          <a href="/rechnungen/{{ r.id }}/pdf?download=1">Download</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="karte">Noch keine Rechnungen. <a href="/">Erste Rechnung erstellen</a></p>
+{% endif %}
+{% endblock %}

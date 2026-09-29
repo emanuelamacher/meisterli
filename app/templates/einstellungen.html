@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titel %}Einstellungen{% endblock %}
+{% macro feld(name, label, typ="text", klasse="", extra="") %}
+  <label class="{{ klasse }}">{{ label }}
+    <input type="{{ typ }}" name="{{ name }}" value="{{ e[name] }}" {{ extra|safe }}
+      {% if fehler[name] %}class="ungueltig"{% endif %}>
+    {% if fehler[name] %}<small class="fehlertext">{{ fehler[name] }}</small>{% endif %}
+  </label>
+{% endmacro %}
+{% block inhalt %}
+<h1>Einstellungen</h1>
+{% if gespeichert %}<p class="meldung erfolg">Gespeichert.</p>{% endif %}
+{% if fehler %}<p class="meldung fehler">Bitte die markierten Felder prüfen.</p>{% endif %}
+
+<form method="post" action="/einstellungen" class="karte">
+  <h2>Firma</h2>
+  <div class="raster">
+    {{ feld("firma_name", "Firmenname", klasse="breit") }}
+    {{ feld("firma_strasse", "Strasse und Nr.", klasse="breit") }}
+    {{ feld("firma_plz", "PLZ", extra='inputmode="numeric"') }}
+    {{ feld("firma_ort", "Ort") }}
+  </div>
+
+  <h2>Zahlung und MWST</h2>
+  <div class="raster">
+    {{ feld("iban", "IBAN", klasse="breit", extra='placeholder="CH93 0076 2011 6238 5295 7"') }}
+    {{ feld("uid", "UID/MWST-Nummer", extra='placeholder="CHE-123.456.789 MWST"') }}
+    {{ feld("zahlungsfrist_tage", "Zahlungsfrist (Tage)", typ="number", extra='min="1" max="365"') }}
+    <label class="checkbox breit">
+      <input type="checkbox" name="mwst_pflichtig" {% if e.mwst_pflichtig %}checked{% endif %}>
+      MWST-pflichtig (8.1 % auf das Netto)
+    </label>
+  </div>
+  <p class="leise">Für den QR-Zahlteil ohne Referenz braucht es eine normale IBAN, keine QR-IBAN.</p>
+  <button type="submit" class="knopf haupt">Speichern</button>
+</form>
+{% endblock %}

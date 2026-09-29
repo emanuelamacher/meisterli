@@ -25,3 +25,8 @@ package = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore:HarfBuzz-Subset:DeprecationWarning",
+    "ignore::DeprecationWarning:starlette.*",
+    "ignore:Using `httpx`",
+]

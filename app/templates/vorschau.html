@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block titel %}Vorschau{% endblock %}
+{% macro u(feld) %}{% if feld in unsicher %} unsicher{% endif %}{% endmacro %}
+{% block inhalt %}
+<h1>Vorschau</h1>
+
+<div class="karte">
+  <p class="dauer">
+    Transkription: <strong>{% if eintrag.dauer_transkription is not none %}{{ "%.1f"|format(eintrag.dauer_transkription) }} s{% else %}übersprungen (Text){% endif %}</strong>
+    · Auslesen: <strong>{{ "%.1f"|format(eintrag.dauer_auslesen or 0) }} s</strong>
+  </p>
+  <h2>Transkript</h2>
+  <pre class="transkript">{{ eintrag.transkript }}</pre>
+  {% if eintrag.audio_pfad %}<audio controls src="/entwuerfe/{{ eintrag.id }}/audio"></audio>{% endif %}
+</div>
+
+{% if not einstellungen_ok %}
+<p class="meldung warnung">Deine Firmendaten sind unvollständig. <a href="/einstellungen">Einstellungen ausfüllen</a></p>
+{% endif %}
+{% if unsicher %}
+<p class="meldung hinweis"><span class="muster unsicher"></span> Gelb markierte Felder sind unsicher oder fehlen – bitte prüfen.</p>
+{% endif %}
+
+<form id="vorschau" class="karte" data-entwurf="{{ eintrag.id }}">
+  <h2>Kunde {% if daten.kunde_bekannt %}<span class="marke-klein">bekannt – Adresse übernommen</span>{% endif %}</h2>
+  <div class="raster">
+    <label class="breit">Name
+      <input name="kunde.name" value="{{ daten.kunde.name }}" class="{{ u('kunde.name') }}" autocomplete="off"></label>
+    <label class="breit">Strasse und Nr.
+      <input name="kunde.strasse" value="{{ daten.kunde.strasse }}" class="{{ u('kunde.strasse') }}"></label>
+    <label>PLZ
+      <input name="kunde.plz" value="{{ daten.kunde.plz }}" class="{{ u('kunde.plz') }}" inputmode="numeric"></label>
+    <label>Ort
+      <input name="kunde.ort" value="{{ daten.kunde.ort }}" class="{{ u('kunde.ort') }}"></label>
+  </div>
+  <p id="kunde-hinweis" class="leise"></p>
+
+  <h2>Rechnung</h2>
+  <div class="raster">
+    <label>Leistungsdatum
+      <input type="date" name="leistungsdatum" value="{{ daten.leistungsdatum or heute }}"
+        class="{% if not daten.leistungsdatum or 'leistungsdatum' in unsicher %}unsicher{% endif %}">
+      {% if not daten.leistungsdatum %}<small>Nicht genannt – heute eingesetzt.</small>{% endif %}
+    </label>
+    <label>Zahlungsfrist (Tage)
+      <input type="number" min="1" max="365" name="zahlungsfrist_tage"
+        value="{{ daten.zahlungsfrist_tage or einstellungen.zahlungsfrist_tage }}"
+        class="{{ u('zahlungsfrist_tage') }}">
+      {% if not daten.zahlungsfrist_tage %}<small>Aus den Einstellungen.</small>{% endif %}
+    </label>
+  </div>
+
+  <h2>Positionen</h2>
+  <table class="positionen">
+    <thead>
+      <tr><th>Beschreibung</th><th class="zahl">Menge</th><th>Einheit</th>
+        <th class="zahl">Preis CHF</th><th class="zahl">Betrag CHF</th><th></th></tr>
+    </thead>
+    <tbody id="positionen">
+    {% for p in positionen %}
+      {% set i = loop.index0 %}
+      <tr class="position">
+        <td><input data-f="beschreibung" value="{{ p.beschreibung }}" class="{{ u('positionen.%d.beschreibung'|format(i)) }}"></td>
+        <td><input data-f="menge" value="{{ p.menge | menge }}" class="zahl{{ u('positionen.%d.menge'|format(i)) }}" inputmode="decimal"></td>
+        <td><input data-f="einheit" value="{{ p.einheit }}" list="einheiten" class="{{ u('positionen.%d.einheit'|format(i)) }}"></td>
+        <td><input data-f="einzelpreis" value="{{ p.einzelpreis if p.einzelpreis is not none else '' }}" class="zahl{{ u('positionen.%d.einzelpreis'|format(i)) }}" inputmode="decimal"></td>
+        <td class="zahl betrag">{{ summen.zeilen[i] }}</td>
+        <td><button type="button" class="loeschen" title="Position löschen">✕</button></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <datalist id="einheiten">
+    <option value="Std."><option value="Stk."><option value="pauschal"><option value="m²"><option value="m"><option value="km">
+  </datalist>
+  <button type="button" id="position-neu" class="knopf">+ Position</button>
+
+  <table class="summen">
+    <tr {% if not summen.mwst_pflichtig %}hidden{% endif %}><td>Total netto</td><td class="zahl">CHF <span id="netto">{{ summen.netto }}</span></td></tr>
+    <tr {% if not summen.mwst_pflichtig %}hidden{% endif %}><td>MWST {{ summen.mwst_satz }} %</td><td class="zahl">CHF <span id="mwst">{{ summen.mwst }}</span></td></tr>
+    <tr class="total"><td>Total</td><td class="zahl">CHF <span id="total">{{ summen.total }}</span></td></tr>
+  </table>
+  {% if not summen.mwst_pflichtig %}<p class="leise">Nicht MWST-pflichtig (siehe Einstellungen).</p>{% endif %}
+
+  <div class="zeile">
+    <button type="submit" class="knopf haupt" id="erstellen">Rechnung erstellen</button>
+    <span id="fortschritt" class="leise"></span>
+  </div>
+  <ul id="fehler" class="meldung fehler" hidden></ul>
+</form>
+{% endblock %}
