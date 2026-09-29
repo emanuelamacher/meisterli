@@ -1,0 +1,44 @@
+[
+  {
+    "id": "keller",
+    "text": "Rächnig für Familie Keller: 3 Stund à 90, 2 Schalter à 24, Sicherigskaschte 180",
+    "kunde": "Familie Keller",
+    "positionen": [
+      {"beschreibung": "Arbeit", "menge": "3", "einheit": "Std.", "einzelpreis": "90"},
+      {"beschreibung": "Lichtschalter", "menge": "2", "einheit": "Stk.", "einzelpreis": "24"},
+      {"beschreibung": "Sicherungskasten", "menge": "1", "einheit": "Stk.", "einzelpreis": "180"}
+    ],
+    "netto": "498.00", "mwst": "40.34", "total": "538.34"
+  },
+  {
+    "id": "brunner",
+    "text": "Rächnig für Frau Brunner: Stube striiche, 42 m² à 18, Abdecke pauschal 120",
+    "kunde": "Frau Brunner",
+    "positionen": [
+      {"beschreibung": "Stube streichen", "menge": "42", "einheit": "m²", "einzelpreis": "18"},
+      {"beschreibung": "Abdecken", "menge": "1", "einheit": "pauschal", "einzelpreis": "120"}
+    ],
+    "netto": "876.00", "mwst": "70.96", "total": "946.96"
+  },
+  {
+    "id": "meier",
+    "text": "Rächnig für Herr Meier: Boiler entkalche, 2 Stund à 95, Dichtige 38, Aafahrt 45",
+    "kunde": "Herr Meier",
+    "positionen": [
+      {"beschreibung": "Boiler entkalken", "menge": "2", "einheit": "Std.", "einzelpreis": "95"},
+      {"beschreibung": "Dichtungen", "menge": "1", "einheit": "pauschal", "einzelpreis": "38"},
+      {"beschreibung": "Anfahrt", "menge": "1", "einheit": "pauschal", "einzelpreis": "45"}
+    ],
+    "netto": "273.00", "mwst": "22.11", "total": "295.11"
+  },
+  {
+    "id": "stweg",
+    "text": "Rächnig für d STWEG Lindenweg 4: Hecke schniide 5 Stund à 75, Grüengut entsorge 60",
+    "kunde": "STWEG Lindenweg 4",
+    "positionen": [
+      {"beschreibung": "Hecke schneiden", "menge": "5", "einheit": "Std.", "einzelpreis": "75"},
+      {"beschreibung": "Grüngut entsorgen", "menge": "1", "einheit": "pauschal", "einzelpreis": "60"}
+    ],
+    "netto": "435.00", "mwst": "35.24", "total": "470.24"
+  }
+]

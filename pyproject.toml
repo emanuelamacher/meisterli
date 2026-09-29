@@ -1,0 +1,27 @@
+[project]
+name = "meisterli"
+version = "0.1.0"
+description = "Pilot: aus einer Sprachnachricht wird eine Schweizer QR-Rechnung"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+    "qrbill>=1.1",
+    "weasyprint>=62",
+    "mlx-whisper>=0.4; sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pypdf>=4",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
