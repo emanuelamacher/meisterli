@@ -2,6 +2,7 @@
 # Startet den Meisterli-Piloten auf http://127.0.0.1:8000
 #   ./run.sh        App starten
 #   ./run.sh test   Tests laufen lassen
+#   ./run.sh probe  rohe Antworten des Sprachmodells für die Testtexte anzeigen
 #   ./run.sh https  Demo im lokalen Netz über HTTPS (fürs Handy, braucht Zertifikate in data/certs/)
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -17,6 +18,7 @@ fi
 if command -v uv >/dev/null; then
   uv sync --quiet
   PY=(uv run --quiet)
+  PYTHON=(uv run --quiet python)
 else
   if [[ ! -x .venv/bin/python ]]; then
     command -v python3.12 >/dev/null || { echo "Python 3.12 oder uv fehlt (brew install uv)."; exit 1; }
@@ -24,6 +26,11 @@ else
     .venv/bin/pip install --quiet -r requirements.txt
   fi
   PY=(.venv/bin/python -m)
+  PYTHON=(.venv/bin/python)
+fi
+
+if [[ "${1:-}" == "probe" ]]; then
+  exec "${PYTHON[@]}" -m app.probe
 fi
 
 if [[ "${1:-}" == "test" ]]; then

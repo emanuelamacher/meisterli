@@ -8,6 +8,7 @@ from datetime import date
 from typing import Protocol
 
 from .auslesen import AuslesenFehler, OllamaClient
+from .positionen import fasse_taetigkeiten_zusammen, nur_positiv
 from .prompt import MUNDART_BEISPIELE
 from .rechnen import zahl
 
@@ -154,7 +155,7 @@ def _zahl(w) -> str | None:
     return None if d is None else format(d.normalize(), "f")
 
 
-def normalisiere(roh: dict) -> dict:
+def normalisiere(roh: dict, text: str = "") -> dict:
     """Bringt die Modellantwort in eine feste Form. Fehlende Teile werden leer."""
     if not isinstance(roh, dict):
         raise AuslesenFehler("Die Antwort des Sprachmodells ist kein JSON-Objekt.")
@@ -166,27 +167,28 @@ def normalisiere(roh: dict) -> dict:
         if isinstance(p, dict) and _text(p.get("beschreibung")):
             positionen.append({
                 "beschreibung": _text(p.get("beschreibung")),
-                "menge": _zahl(p.get("menge")),
+                "menge": nur_positiv(_zahl(p.get("menge"))),
                 "einheit": _text(p.get("einheit")) or "",
-                "einzelpreis": _zahl(p.get("einzelpreis")),
+                "einzelpreis": nur_positiv(_zahl(p.get("einzelpreis"))),
             })
+    positionen = fasse_taetigkeiten_zusammen(positionen, text)
     aendern = []
     for p in ae.get("positionen_aendern") or []:
         if isinstance(p, dict) and isinstance(p.get("nr"), int):
             aendern.append({
                 "nr": p["nr"],
                 "beschreibung": _text(p.get("beschreibung")),
-                "menge": _zahl(p.get("menge")),
+                "menge": nur_positiv(_zahl(p.get("menge"))),
                 "einheit": _text(p.get("einheit")),
-                "einzelpreis": _zahl(p.get("einzelpreis")),
+                "einzelpreis": nur_positiv(_zahl(p.get("einzelpreis"))),
                 "entfernen": bool(p.get("entfernen")),
             })
     frist = ae.get("zahlungsfrist_tage")
     frist = int(frist) if isinstance(frist, (int, float)) and not isinstance(frist, bool) and frist > 0 else None
     antwort_roh = roh.get("antwort_auf_rueckfrage") if isinstance(roh.get("antwort_auf_rueckfrage"), dict) else {}
     antwort = {f: _text(antwort_roh.get(f)) for f in ("wert", "bedeutung", "name", "strasse", "plz", "ort")}
-    antwort["betrag"] = _zahl(antwort_roh.get("betrag"))
-    antwort["menge"] = _zahl(antwort_roh.get("menge"))
+    antwort["betrag"] = nur_positiv(_zahl(antwort_roh.get("betrag")))
+    antwort["menge"] = nur_positiv(_zahl(antwort_roh.get("menge")))
     return {
         "absicht": absicht,
         "aenderungen": {
@@ -208,5 +210,5 @@ class OllamaChatModell(OllamaClient):
     def deute(self, nachricht: str, kontext: dict) -> dict:
         if not nachricht or not nachricht.strip():
             raise AuslesenFehler("Die Nachricht ist leer.")
-        return normalisiere(self.json_chat(SYSTEMPROMPT, nutzertext(nachricht, kontext), SCHEMA))
+        return normalisiere(self.json_chat(SYSTEMPROMPT, nutzertext(nachricht, kontext), SCHEMA), nachricht)
 

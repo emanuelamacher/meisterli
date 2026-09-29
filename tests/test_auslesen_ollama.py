@@ -37,7 +37,7 @@ def test_echtes_ollama(fall):
         if p["menge"] and p["einzelpreis"]
     )
     erwartet = sorted((Decimal(p["menge"]), Decimal(p["einzelpreis"])) for p in fall["positionen"])
-    assert erhalten == erwartet
+    assert erhalten == erwartet, entwurf["positionen"]
 
     positionen = [
         Position(p["beschreibung"], Decimal(p["menge"]), p["einheit"], Decimal(p["einzelpreis"]))

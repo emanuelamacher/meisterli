@@ -408,7 +408,7 @@ class Gespraech:
             d = zahl(w)
         except ValueError:
             return None
-        return d if d is not None and d >= 0 else None
+        return d if d is not None and d > 0 else None
 
     @staticmethod
     def _ersetze_begriff(position: dict, begriff: str, bedeutung: str) -> bool:

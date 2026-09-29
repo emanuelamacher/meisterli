@@ -245,6 +245,11 @@ Phase 2:
 - `test_chat_modell.py`: Anfrage an Ollama (Schema, Temperatur 0, Kontext)
 - `test_chat_ollama.py`: die vier Gespräche mit dem echten Ollama. Vergleicht nur Mengen,
   Preise und Totale. Wird übersprungen, wenn Ollama nicht läuft.
+- `test_positionen.py`: Bereinigung typischer Modellfehler (Preis 0 statt «fehlt»,
+  Tätigkeit als eigene Position ohne Menge)
+
+Schlägt ein Test mit dem echten Ollama fehl, zeigt `./run.sh probe` die rohen Antworten des
+Sprachmodells für alle Testtexte – roh und nach der Bereinigung durch Python.
 
 ## Aufbau
 

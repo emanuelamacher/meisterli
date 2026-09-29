@@ -8,6 +8,7 @@ from typing import Protocol
 import httpx
 
 from . import config
+from .positionen import fasse_taetigkeiten_zusammen, nur_positiv
 from .prompt import SYSTEMPROMPT, nutzernachricht
 from .rechnen import zahl
 
@@ -72,7 +73,7 @@ def _zahl_text(wert) -> str | None:
     return None if d is None else format(d.normalize(), "f")
 
 
-def normalisiere(roh: dict) -> dict:
+def normalisiere(roh: dict, text: str = "") -> dict:
     """Macht aus der Modellantwort einen sauberen Entwurf.
 
     Zahlen werden als Text (für Decimal) gespeichert. Fehlende Angaben landen
@@ -95,21 +96,21 @@ def normalisiere(roh: dict) -> dict:
         except ValueError:
             unsicher.add("leistungsdatum")
 
-    positionen = []
+    roh_positionen = []
     for p in roh.get("positionen") or []:
         if not isinstance(p, dict):
             continue
-        i = len(positionen)
-        pos = {
+        roh_positionen.append({
             "beschreibung": _text(p.get("beschreibung")),
-            "menge": _zahl_text(p.get("menge")),
+            "menge": nur_positiv(_zahl_text(p.get("menge"))),
             "einheit": _text(p.get("einheit")),
-            "einzelpreis": _zahl_text(p.get("einzelpreis")),
-        }
+            "einzelpreis": nur_positiv(_zahl_text(p.get("einzelpreis"))),
+        })
+    positionen = fasse_taetigkeiten_zusammen(roh_positionen, text)
+    for i, pos in enumerate(positionen):
         for f in ("beschreibung", "menge", "einzelpreis"):
             if not pos[f]:
                 unsicher.add(f"positionen.{i}.{f}")
-        positionen.append(pos)
     if not positionen:
         unsicher.add("positionen")
 
@@ -202,4 +203,4 @@ class OllamaAusleser(OllamaClient):
     def lese_aus(self, text: str, heute: date | None = None) -> dict:
         if not text or not text.strip():
             raise AuslesenFehler("Der Text ist leer.")
-        return normalisiere(self.roh(text, heute))
+        return normalisiere(self.roh(text, heute), text)

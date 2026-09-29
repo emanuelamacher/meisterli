@@ -8,6 +8,11 @@ Beispiele für Schweizerdeutsch:
 - "2 Schalter à 24" → {"beschreibung": "Lichtschalter", "menge": 2, "einheit": "Stk.", "einzelpreis": 24}
 - "Sicherigskaschte 180" → {"beschreibung": "Sicherungskasten", "menge": 1, "einheit": "Stk.", "einzelpreis": 180}
 - "42 m² à 18" / "42 Quadratmeter à 18" → menge 42, einheit "m²", einzelpreis 18
+- Tätigkeit und Menge gehören in EINE Position, auch mit Komma dazwischen:
+  "Gang striiche, 30 m² à 20" → {"beschreibung": "Gang streichen", "menge": 30, "einheit": "m²", "einzelpreis": 20}
+  "Lavabo montiere, 3 Stund à 85" → {"beschreibung": "Lavabo montieren", "menge": 3, "einheit": "Std.", "einzelpreis": 85}
+- Fehlt der Preis, ist einzelpreis null – niemals 0:
+  "Dach kontrolliere 2 Stund" → {"beschreibung": "Dach kontrollieren", "menge": 2, "einheit": "Std.", "einzelpreis": null}
 - "striiche" → streichen, "entkalche" → entkalken, "schniide" → schneiden,
   "entsorge" → entsorgen, "Dichtige" → Dichtungen, "Grüengut" → Grüngut, "Stube" → Wohnzimmer/Stube
 """
